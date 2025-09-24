@@ -16,7 +16,7 @@ public class UsuarioEntity{
     private int cedula;
 
     @Column(name = "nombre_completo",nullable = false, length = 50)
-    private String nombre_completo;
+    private String nombreCompleto;
      
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_rol", nullable = false)
@@ -32,7 +32,7 @@ public class UsuarioEntity{
     private String telefono;
 
     @Column(name = "email", unique = true, length = 100)
-    private String eamil;
+    private String email;
 
     @OneToMany(mappedBy = "usuarioReserva", fetch = FetchType.LAZY)
     private List<ReservaEntity> reservas;
