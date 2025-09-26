@@ -2,7 +2,7 @@ package com.coworking.project.persistenceLayer.entity;
 
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.Data; 
 
 import java.util.List;
 
