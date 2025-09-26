@@ -19,7 +19,7 @@ public class ReservaEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_reserva")
-    private Integer idReserva;
+    private int idReserva;
 
     @Column(name = "fecha_inicio", nullable = false)
     private LocalDate fechaInicio;
