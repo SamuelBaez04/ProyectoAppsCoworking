@@ -43,8 +43,11 @@ public class UsuarioServiceImpl implements UsuarioService {
             throw new RuntimeException("Ya existe un usuario con el email: " + request.getEmail());
         }
         
+        // CORRECCIÓN 1: Convertir el Integer (request.getIdRol()) a Long.
+        Long idRolLong = request.getIdRol().longValue();
+        
         // Buscar el rol
-        RolEntity rol = rolRepository.findById(request.getIdRol())
+        RolEntity rol = rolRepository.findById(idRolLong)
                 .orElseThrow(() -> new ResourceNotFoundException("Rol", "id", request.getIdRol()));
         
         // Crear la entidad usuario
@@ -100,9 +103,13 @@ public class UsuarioServiceImpl implements UsuarioService {
             throw new RuntimeException("Ya existe un usuario con el email: " + request.getEmail());
         }
         
+        // CORRECCIÓN 2: Usar getRolEntity().getIdRol() y convertir request.getIdRol() a Long.
+        Long idRolLong = request.getIdRol().longValue();
+        
         // Buscar el rol si cambió
-        if (!usuario.getRolEntity().getId().equals(request.getIdRol())) {
-            RolEntity rol = rolRepository.findById(request.getIdRol())
+        if (!usuario.getRolEntity().getIdRol().equals(idRolLong)) {
+            // CORRECCIÓN 3: Usar el Long casteado.
+            RolEntity rol = rolRepository.findById(idRolLong)
                     .orElseThrow(() -> new ResourceNotFoundException("Rol", "id", request.getIdRol()));
             usuario.setRolEntity(rol);
         }
@@ -154,8 +161,10 @@ public class UsuarioServiceImpl implements UsuarioService {
         return new UsuarioResponseDto(
                 usuario.getCedula(),
                 usuario.getNombreCompleto(),
-                usuario.getRolEntity().getNombre(),
-                usuario.getRolEntity().getId(),
+                // CORRECCIÓN 4: Usar getRolEntity().getNombreRol()
+                usuario.getRolEntity().getNombreRol(),
+                // CORRECCIÓN 5: Usar getRolEntity().getIdRol()
+                usuario.getRolEntity().getIdRol(),
                 usuario.getDireccion(),
                 usuario.getTelefono(),
                 usuario.getEmail()

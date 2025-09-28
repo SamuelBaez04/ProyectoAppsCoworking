@@ -11,14 +11,13 @@ public class UsuarioResponseDto {
     private Integer cedula;
     private String nombreCompleto;
     private String nombreRol;
-    private Integer idRol;
+    private Long idRol;
     private String direccion;
     private String telefono;
     private String email;
     
     // Constructor completo
-    public UsuarioResponseDto(Integer cedula, String nombreCompleto, String nombreRol, 
-                             Integer idRol, String direccion, String telefono, String email) {
+    public UsuarioResponseDto(Integer cedula, String nombreCompleto, String nombreRol, Long idRol, String direccion, String telefono, String email) {
         this.cedula = cedula;
         this.nombreCompleto = nombreCompleto;
         this.nombreRol = nombreRol;
