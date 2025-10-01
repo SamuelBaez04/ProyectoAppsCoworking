@@ -1,4 +1,4 @@
-package com.coworking.project.dto.request;
+package com.coworking.project.businessLayer.dto.request;
 
 import lombok.Data;
 import jakarta.validation.constraints.*;

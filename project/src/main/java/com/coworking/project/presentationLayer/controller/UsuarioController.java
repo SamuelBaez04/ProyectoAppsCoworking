@@ -1,8 +1,9 @@
-package com.coworking.project.controller;
+package com.coworking.project.presentationLayer.controller;
 
-import com.coworking.project.dto.request.UsuarioRequestDto;
-import com.coworking.project.dto.response.UsuarioResponseDto;
-import com.coworking.project.service.UsuarioService;
+import com.coworking.project.businessLayer.dto.request.UsuarioRequestDto;
+import com.coworking.project.businessLayer.dto.response.UsuarioResponseDto;
+import com.coworking.project.businessLayer.service.UsuarioService;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;

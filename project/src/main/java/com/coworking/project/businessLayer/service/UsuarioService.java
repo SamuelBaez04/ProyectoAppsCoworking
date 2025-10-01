@@ -1,9 +1,9 @@
-package com.coworking.project.service;
-
-import com.coworking.project.dto.request.UsuarioRequestDto;
-import com.coworking.project.dto.response.UsuarioResponseDto;
+package com.coworking.project.businessLayer.service;
 
 import java.util.List;
+
+import com.coworking.project.businessLayer.dto.request.UsuarioRequestDto;
+import com.coworking.project.businessLayer.dto.response.UsuarioResponseDto;
 
 /**
  * Interfaz del servicio de Usuario

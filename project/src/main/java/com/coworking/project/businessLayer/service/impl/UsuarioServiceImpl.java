@@ -1,13 +1,14 @@
-package com.coworking.project.service.impl;
+package com.coworking.project.businessLayer.service.impl;
 
-import com.coworking.project.dto.request.UsuarioRequestDto;
-import com.coworking.project.dto.response.UsuarioResponseDto;
+import com.coworking.project.businessLayer.dto.request.UsuarioRequestDto;
+import com.coworking.project.businessLayer.dto.response.UsuarioResponseDto;
+import com.coworking.project.businessLayer.service.UsuarioService;
 import com.coworking.project.exception.ResourceNotFoundException;
 import com.coworking.project.persistenceLayer.entity.RolEntity;
 import com.coworking.project.persistenceLayer.entity.UsuarioEntity;
 import com.coworking.project.persistenceLayer.repository.RolRepository;
 import com.coworking.project.persistenceLayer.repository.UsuarioRepository;
-import com.coworking.project.service.UsuarioService;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

@@ -1,4 +1,4 @@
-package com.coworking.project.dto.response;
+package com.coworking.project.businessLayer.dto.response;
 
 import lombok.Data;
 
@@ -29,5 +29,8 @@ public class UsuarioResponseDto {
     
     // Constructor vacío (requerido por Lombok)
     public UsuarioResponseDto() {
+    
     }
+
+
 }
