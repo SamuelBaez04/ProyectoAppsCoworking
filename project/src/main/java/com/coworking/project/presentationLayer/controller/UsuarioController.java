@@ -134,6 +134,38 @@ public ResponseEntity<UsuarioDTO> obtenerUsuarioPorCedula(
             return ResponseEntity.ok(usuarios); 
         }
 
+        @GetMapping("/email/{email}")
+        @Operation(
+                summary = "Buscar usuario por email",
+                description = "Obtiene la información completa de un usuario en especifico por su email"
+        )
+        @ApiResponses(value = {
+                @ApiResponse(
+                        responseCode = "200",
+                        description = "Usuario encontrado",
+                        content = @Content(
+                                mediaType = "application/json",
+                                schema = @Schema(implementation = UsuarioDTO.class)
+                        )
+                ),
+                @ApiResponse(
+                        responseCode = "404",
+                        description = "Usuario no encontrado"
+                )
+        })
+        public ResponseEntity<UsuarioDTO> obtenerUsuarioPorEmail(
+                @Parameter(description = "Email del usuario a buscar", required = true, example = "natsab@example.com")
+                @PathVariable String email
+        ) {
+            log.debug("GET /api/usuarios/email/{} - Buscando usuario por email", email);
+            try {
+                UsuarioDTO usuario = usuarioService.obtenerUsuarioPorEmail(email);
+                return ResponseEntity.ok(usuario);
+            } catch (RuntimeException e) {
+                log.warn("Usuario no encontrado con email: {}", email);
+                return ResponseEntity.notFound().build();       
+            }
+        }        
 
 
 
