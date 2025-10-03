@@ -13,12 +13,12 @@ import lombok.NoArgsConstructor;
 public class UsuarioUpdateDTO {
 
     @Schema(description = "Nombre completo del usuario",
-            example = "María González Tech",
+            example = "Samuel Valencia",
             maxLength = 100)
     private String nombreCompleto;
 
     @Schema(description = "Número de teléfono del vendedor",
-            example = "+57-300-1234567",
+            example = "+5731221269275",
             maxLength = 20)
     private String telefono;
 
