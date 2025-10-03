@@ -2,8 +2,9 @@ package com.coworking.project.businessLayer.service;
 
 import java.util.List;
 
-import com.coworking.project.businessLayer.dto.request.UsuarioRequestDto;
-import com.coworking.project.businessLayer.dto.response.UsuarioResponseDto;
+import com.coworking.project.businessLayer.dto.UsuarioCreateDTO;
+import com.coworking.project.businessLayer.dto.UsuarioDTO;
+import com.coworking.project.businessLayer.dto.UsuarioUpdateDTO;
 
 /**
  * Interfaz del servicio de Usuario
@@ -16,20 +17,20 @@ public interface UsuarioService {
      * @param request Datos del usuario a crear
      * @return Usuario creado
      */
-    UsuarioResponseDto crearUsuario(UsuarioRequestDto request);
+    UsuarioDTO crearUsuario(UsuarioCreateDTO createDTO);
     
     /**
      * Obtener usuario por cédula
      * @param cedula Cédula del usuario
      * @return Usuario encontrado
      */
-    UsuarioResponseDto obtenerUsuarioPorCedula(Integer cedula);
+    UsuarioDTO obtenerUsuarioPorCedula(int cedula);
     
     /**
      * Listar todos los usuarios
      * @return Lista de usuarios
      */
-    List<UsuarioResponseDto> listarUsuarios();
+    List<UsuarioDTO> listarUsuarios();
     
     /**
      * Actualizar usuario existente
@@ -37,7 +38,7 @@ public interface UsuarioService {
      * @param request Nuevos datos del usuario
      * @return Usuario actualizado
      */
-    UsuarioResponseDto actualizarUsuario(Integer cedula, UsuarioRequestDto request);
+    UsuarioDTO actualizarUsuario(int cedula, UsuarioUpdateDTO updateDTO);
     
     /**
      * Eliminar usuario por cédula
@@ -50,5 +51,5 @@ public interface UsuarioService {
      * @param email Email a buscar
      * @return Usuario encontrado
      */
-    UsuarioResponseDto obtenerUsuarioPorEmail(String email);
+    UsuarioDTO obtenerUsuarioPorEmail(String email);
 }

@@ -1,13 +1,12 @@
 package com.coworking.project.businessLayer.service.impl;
 
-import com.coworking.project.businessLayer.dto.request.UsuarioRequestDto;
-import com.coworking.project.businessLayer.dto.response.UsuarioResponseDto;
+
+import com.coworking.project.businessLayer.dto.UsuarioCreateDTO;
+import com.coworking.project.businessLayer.dto.UsuarioDTO;
+import com.coworking.project.businessLayer.dto.UsuarioUpdateDTO;
 import com.coworking.project.businessLayer.service.UsuarioService;
 import com.coworking.project.exception.ResourceNotFoundException;
-import com.coworking.project.persistenceLayer.entity.RolEntity;
-import com.coworking.project.persistenceLayer.entity.UsuarioEntity;
-import com.coworking.project.persistenceLayer.repository.RolRepository;
-import com.coworking.project.persistenceLayer.repository.UsuarioRepository;
+import com.coworking.project.persistenceLayer.dao.UsuarioDAO;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,7 +14,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Implementación del servicio de Usuario
@@ -27,148 +25,78 @@ import java.util.stream.Collectors;
 @Transactional
 public class UsuarioServiceImpl implements UsuarioService {
 
-    private final UsuarioRepository usuarioRepository;
-    private final RolRepository rolRepository;
+    private final UsuarioDAO usuarioDAO;
+
 
     @Override
-    public UsuarioResponseDto crearUsuario(UsuarioRequestDto request) {
-        log.info("Creando usuario con cédula: {}", request.getCedula());
-        
-        // Validar que no exista el usuario
-        if (usuarioRepository.existsById(request.getCedula())) {
-            throw new RuntimeException("Ya existe un usuario con la cédula: " + request.getCedula());
+    public UsuarioDTO crearUsuario(UsuarioCreateDTO createDTO) {
+        log.info("Creando Usuario nuevo usuario con el email: {}", createDTO.getEmail());
+        if(usuarioDAO.existByEmail(createDTO.getEmail())) {
+            log.warn("Intento de crear usuario con email duplicado: {}",createDTO.getEmail());
+            throw new IllegalArgumentException("Ya exite un usuario con el email"+ createDTO.getEmail());
         }
-        
-        // Validar que no exista el email
-        if (usuarioRepository.findByEmail(request.getEmail()).isPresent()) {
-            throw new RuntimeException("Ya existe un usuario con el email: " + request.getEmail());
-        }
-        
-        // CORRECCIÓN 1: Convertir el Integer (request.getIdRol()) a Long.
-        Long idRolLong = request.getIdRol().longValue();
-        
-        // Buscar el rol
-        RolEntity rol = rolRepository.findById(idRolLong)
-                .orElseThrow(() -> new ResourceNotFoundException("Rol", "id", request.getIdRol()));
-        
-        // Crear la entidad usuario
-        UsuarioEntity usuario = new UsuarioEntity();
-        usuario.setCedula(request.getCedula());
-        usuario.setNombreCompleto(request.getNombreCompleto());
-        usuario.setRolEntity(rol);
-        usuario.setDireccion(request.getDireccion());
-        usuario.setPassword(request.getPassword()); // TODO: Encriptar password
-        usuario.setTelefono(request.getTelefono());
-        usuario.setEmail(request.getEmail());
-        
-        // Guardar
-        UsuarioEntity savedUsuario = usuarioRepository.save(usuario);
-        
-        log.info("Usuario creado exitosamente con cédula: {}", savedUsuario.getCedula());
-        return mapToResponseDto(savedUsuario);
+        UsuarioDTO createUsuario = usuarioDAO.crearUsuario(createDTO);
+        log.info("Usuario creado exitosamente con id: {}", createUsuario.getCedula());
+        return createUsuario;
+    }
+
+    @Override
+    public UsuarioDTO obtenerUsuarioPorCedula(int cedula) {
+        log.debug("Creando usuario por cedula: {}", cedula);
+
+        return usuarioDAO.findyById(cedula).orElseThrow(() -> {
+            log.warn("Usuario no encontrado con cedula: {}", cedula);
+            return new RuntimeException("Vendedor no encontrado con cedula: " + cedula);
+        });
     }
 
     @Override
     @Transactional(readOnly = true)
-    public UsuarioResponseDto obtenerUsuarioPorCedula(Integer cedula) {
-        log.info("Buscando usuario con cédula: {}", cedula);
-        
-        UsuarioEntity usuario = usuarioRepository.findById(cedula)
-                .orElseThrow(() -> new ResourceNotFoundException("Usuario", "cédula", cedula));
-        
-        return mapToResponseDto(usuario);
+    public List<UsuarioDTO> listarUsuarios() {
+        log.debug("Obteniendo todos los usuarios");
+        return usuarioDAO.findAll();
     }
 
     @Override
-    @Transactional(readOnly = true)
-    public List<UsuarioResponseDto> listarUsuarios() {
-        log.info("Listando todos los usuarios");
-        
-        List<UsuarioEntity> usuarios = usuarioRepository.findAll();
-        
-        return usuarios.stream()
-                .map(this::mapToResponseDto)
-                .collect(Collectors.toList());
-    }
+    public UsuarioDTO actualizarUsuario(int cedula, UsuarioUpdateDTO updateDTO) {
+        log.info("Actualizando usuario con cedula: {}", cedula);
 
-    @Override
-    public UsuarioResponseDto actualizarUsuario(Integer cedula, UsuarioRequestDto request) {
-        log.info("Actualizando usuario con cédula: {}", cedula);
-        
-        UsuarioEntity usuario = usuarioRepository.findById(cedula)
-                .orElseThrow(() -> new ResourceNotFoundException("Usuario", "cédula", cedula));
-        
-        // Validar email único (si cambió)
-        if (!usuario.getEmail().equals(request.getEmail()) && 
-            usuarioRepository.findByEmail(request.getEmail()).isPresent()) {
-            throw new RuntimeException("Ya existe un usuario con el email: " + request.getEmail());
+        if(!usuarioDAO.findyById(cedula).isPresent()) {
+            log.warn("Intento de acutalizar usuario inexistente por cedula: {}", cedula);
+            throw new RuntimeException("Usuario no encontrado con cedula: "+ cedula);
         }
-        
-        // CORRECCIÓN 2: Usar getRolEntity().getIdRol() y convertir request.getIdRol() a Long.
-        Long idRolLong = request.getIdRol().longValue();
-        
-        // Buscar el rol si cambió
-        if (!usuario.getRolEntity().getIdRol().equals(idRolLong)) {
-            // CORRECCIÓN 3: Usar el Long casteado.
-            RolEntity rol = rolRepository.findById(idRolLong)
-                    .orElseThrow(() -> new ResourceNotFoundException("Rol", "id", request.getIdRol()));
-            usuario.setRolEntity(rol);
-        }
-        
-        // Actualizar campos
-        usuario.setNombreCompleto(request.getNombreCompleto());
-        usuario.setDireccion(request.getDireccion());
-        usuario.setTelefono(request.getTelefono());
-        usuario.setEmail(request.getEmail());
-        
-        // Solo actualizar password si viene en el request
-        if (request.getPassword() != null && !request.getPassword().isEmpty()) {
-            usuario.setPassword(request.getPassword()); // TODO: Encriptar password
-        }
-        
-        UsuarioEntity updatedUsuario = usuarioRepository.save(usuario);
-        
-        log.info("Usuario actualizado exitosamente con cédula: {}", cedula);
-        return mapToResponseDto(updatedUsuario);
+        UsuarioDTO updateUsuario = usuarioDAO.update(cedula, updateDTO).orElseThrow(()-> new RuntimeException("Error al actualizar usuario"));
+        log.info("Usuario actualziado exitosamente cedula: {}", cedula);
+        return updateUsuario;
     }
 
     @Override
     public void eliminarUsuario(Integer cedula) {
-        log.info("Eliminando usuario con cédula: {}", cedula);
-        
-        UsuarioEntity usuario = usuarioRepository.findById(cedula)
-                .orElseThrow(() -> new ResourceNotFoundException("Usuario", "cédula", cedula));
-        
-        usuarioRepository.delete(usuario);
-        
-        log.info("Usuario eliminado exitosamente con cédula: {}", cedula);
+        log.info("Eliminando usuario con cedula: {}", cedula);
+        UsuarioDTO usuarioDTO = obtenerUsuarioPorCedula(cedula);
+
+        int contadorReservas = usuarioDAO.countReservasByUsuarioId(cedula);
+        if(contadorReservas > 0) {
+            log.warn("Intento de eliminar vendedor con reservas. cedula:{}, Reservas: {}", cedula, contadorReservas);
+            throw new IllegalStateException(
+                    String.format("No se puede elimianr el usuario por que tiene %d reserva(s) activa(s)",  contadorReservas)
+            );
+        }
+
+        boolean deleted = usuarioDAO.deleteById(cedula);
+        if(!deleted) {
+            throw new RuntimeException("Error al eliminar vendedor con cedula: " + cedula);
+        }
+        log.info("Usuario eliminado exitosamente cedula: {}", cedula);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public UsuarioResponseDto obtenerUsuarioPorEmail(String email) {
-        log.info("Buscando usuario con email: {}", email);
-        
-        UsuarioEntity usuario = usuarioRepository.findByEmail(email)
-                .orElseThrow(() -> new ResourceNotFoundException("Usuario", "email", email));
-        
-        return mapToResponseDto(usuario);
-    }
-
-    /**
-     * Método privado para mapear UsuarioEntity a UsuarioResponseDto
-     */
-    private UsuarioResponseDto mapToResponseDto(UsuarioEntity usuario) {
-        return new UsuarioResponseDto(
-                usuario.getCedula(),
-                usuario.getNombreCompleto(),
-                // CORRECCIÓN 4: Usar getRolEntity().getNombreRol()
-                usuario.getRolEntity().getNombreRol(),
-                // CORRECCIÓN 5: Usar getRolEntity().getIdRol()
-                usuario.getRolEntity().getIdRol(),
-                usuario.getDireccion(),
-                usuario.getTelefono(),
-                usuario.getEmail()
-        );
+    public UsuarioDTO obtenerUsuarioPorEmail(String email) {
+        log.debug("Obteniendo usuario por email: {}", email);
+        return usuarioDAO.findByEmail(email).orElseThrow(() -> {
+            log.warn("Usuario no encontrado con email: {}", email);
+            return new RuntimeException("Usuario no encontrado con email: " + email);
+        });
     }
 }

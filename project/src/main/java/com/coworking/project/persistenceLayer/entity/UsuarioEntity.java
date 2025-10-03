@@ -24,8 +24,8 @@ public class UsuarioEntity{
      
     // Relación Many-to-One: FK id_rol
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_rol", nullable = false)
-    private RolEntity rolEntity;
+    @JoinColumn(name = "id_rol", referencedColumnName = "id_rol", nullable = false)
+    private RolEntity rol;
 
     @Column(name = "direccion", length = 150)
     private String direccion;
