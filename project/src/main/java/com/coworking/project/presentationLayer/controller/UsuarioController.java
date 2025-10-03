@@ -2,6 +2,7 @@ package com.coworking.project.presentationLayer.controller;
 
 import com.coworking.project.businessLayer.dto.UsuarioCreateDTO;
 import com.coworking.project.businessLayer.dto.UsuarioDTO;
+import com.coworking.project.businessLayer.dto.UsuarioUpdateDTO;
 import com.coworking.project.businessLayer.service.UsuarioService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -73,6 +74,183 @@ public class UsuarioController {
         }
     }
 
+    @PutMapping("/{cedula}")
+    @Operation(
+        summary = "Actualizar usuario existente",
+        description = "Actualizar los datos de un usuario existente identificado por su cedula"
+    )
+    @ApiResponses( value ={
+        @ApiResponse(
+            responseCode = "200",
+            description = "Usuario actualizado exitosamente",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = UsuarioDTO.class)
+            )
+        ),
+        @ApiResponse(
+            responseCode = "400",
+            description = "Datos invalidos"
+        ),
+        @ApiResponse(
+            responseCode = "404",
+            description = "Usuario no encontrado"
+        )   
+    })
+    public ResponseEntity<UsuarioDTO> actualizarUsuario(
+        @Parameter(description = "Cedula del usuario a actualizar", required = true, example = "1")
+        @PathVariable int cedula,
+        @Parameter(description = "Datos actualizados del usuario", required = true)
+        @RequestBody UsuarioUpdateDTO updateDTO
+    ){
+        log.info("PUT /api/usuarios/{} - Actualizando usuario", cedula);
+        try{
+                UsuarioDTO updatedUsuario = usuarioService.actualizarUsuario(cedula, updateDTO);
+                log.info("Usuario actualizado exitosamente: {}", cedula);
+                return ResponseEntity.ok(updatedUsuario);
+        }catch(RuntimeException e){
+                if(e.getMessage().contains("no encontrado")){
+                        log.warn("Usuario no encontrado para actualizar Cedula: {}", cedula);
+                        return ResponseEntity.notFound().build();
+                }
+                log.warn("Error al actualizar el usuario con cedula{}: {} ",cedula, e.getMessage());
+                return ResponseEntity.badRequest().build();
+        }
+    }
 
+
+    @DeleteMapping("/{cedula}")
+    @Operation(
+                summary = "Eliminar usuario",
+                description = "Elimina un Usuario del sistema. No se puede eliminar si tiene reservas activas"
+    )
+    @ApiResponses( value = {
+        @ApiResponse(
+                responseCode = "204",
+                description = "Usuario eliminado exitosamente"
+        ),
+        @ApiResponse(
+                responseCode = "404",
+                description = "Usuario no encontrado"
+        ),
+        @ApiResponse(
+                responseCode = "409",
+                description = "No se puede eliminar, el usuario tiene reservas activas"
+        )
+    })
+    public ResponseEntity<Void> eliminarUsuario(
+        @Parameter(description = "Cedula del usuario", required = true, example = "1")
+        @PathVariable int cedula
+    ){
+        log.info ("DELETE /api/usuarios/{} - Eliminando Usuario", cedula);
+        try{
+            usuarioService.eliminarUsuario(cedula);
+            log.info("Usuario eliminado exitosamente cedula: {}", cedula);
+            return ResponseEntity.noContent().build();
+        }catch(RuntimeException e){
+                if(e.getMessage().contains("no encontrado")){
+                  log.warn("Usuario no encontrado para eliminar cedula : {}", cedula);
+                  return ResponseEntity.notFound().build();
+                }else if(e.getMessage().contains("reserva")){
+                  log.warn("Intento de eliminar usuario con reservas activas cedula: {} ", cedula);
+                  return ResponseEntity.status(HttpStatus.CONFLICT).build();
+                }
+                log.error("Error al intentar eliminar usuario con reservas cedula: {}", cedula, e.getMessage());
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+         @GetMapping("/{cedula}")
+    @Operation(
+            summary = "Buscar usuario por cedula",
+            description = "Obtiene la información completa de un usuario en especifico"
+    )       
+    @ApiResponses(value = {
+        @ApiResponse(
+                    responseCode = "200",
+                    description = "Usuario encontrado",
+                    content = @Content(
+                                mediaType = "application/json",
+                                schema = @Schema(implementation = UsuarioDTO.class)
+                     )
+                            
+            ),
+             @ApiResponse(
+                        responseCode =  "404",
+                        description = "Usuario no encontrado"
+              )
+
+    })
+public ResponseEntity<UsuarioDTO> obtenerUsuarioPorCedula(
+        @Parameter(description = "Cedula del usuario a buscar", required = true, example = "1")
+        @PathVariable int cedula
+){
+    log.debug("GET /api/usuarios/{} - Buscando usuario por cedula", cedula);
+
+    try{
+        UsuarioDTO usuario = usuarioService.obtenerUsuarioPorCedula(cedula);
+        log.info("Usuario encontrado: {}", cedula);
+        return ResponseEntity.ok(usuario);                 
+        } catch (RuntimeException e){
+        log.warn("Usuario no encontrado con cedula: {}", cedula);
+        return ResponseEntity.notFound().build();
+    }
+}
+
+
+        @GetMapping
+        @Operation(
+                summary = "Listar todos los usuarios",
+                description = "Obtiene una lista de todos los usuarios registrados en el sistema"
+        )
+        @ApiResponses(value = {
+                @ApiResponse(
+                        responseCode = "200",
+                        description = "Lista de usuarios obtenida exitosamente",
+                        content = @Content(
+                                mediaType = "application/json",
+                                schema = @Schema(implementation = UsuarioDTO.class)
+                        )
+                )
+        })
+        public ResponseEntity<List<UsuarioDTO>> listarUsuarios() {
+            log.debug("GET /api/usuarios - Listando todos los usuarios");
+            List<UsuarioDTO> usuarios = usuarioService.listarUsuarios();
+            log.debug("Total usuarios encontrados: {}", usuarios.size());
+            return ResponseEntity.ok(usuarios); 
+        }
+
+        @GetMapping("/email/{email}")
+        @Operation(
+                summary = "Buscar usuario por email",
+                description = "Obtiene la información completa de un usuario en especifico por su email"
+        )
+        @ApiResponses(value = {
+                @ApiResponse(
+                        responseCode = "200",
+                        description = "Usuario encontrado",
+                        content = @Content(
+                                mediaType = "application/json",
+                                schema = @Schema(implementation = UsuarioDTO.class)
+                        )
+                ),
+                @ApiResponse(
+                        responseCode = "404",
+                        description = "Usuario no encontrado"
+                )
+        })
+        public ResponseEntity<UsuarioDTO> obtenerUsuarioPorEmail(
+                @Parameter(description = "Email del usuario a buscar", required = true, example = "natsab@example.com")
+                @PathVariable String email
+        ) {
+            log.debug("GET /api/usuarios/email/{} - Buscando usuario por email", email);
+            try {
+                UsuarioDTO usuario = usuarioService.obtenerUsuarioPorEmail(email);
+                return ResponseEntity.ok(usuario);
+            } catch (RuntimeException e) {
+                log.warn("Usuario no encontrado con email: {}", email);
+                return ResponseEntity.notFound().build();       
+            }
+        }   
 
 }
