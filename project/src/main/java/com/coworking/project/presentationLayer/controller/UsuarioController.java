@@ -72,4 +72,75 @@ public class UsuarioController {
             return ResponseEntity.badRequest().build();
         }
     }
+
+    
+    @GetMapping("/{cedula}")
+    @Operation(
+            summary = "Buscar usuario por cedula",
+            description = "Obtiene la información completa de un usuario en especifico"
+    )       
+    @ApiResponses(value = {
+        @ApiResponse(
+                    responseCode = "200",
+                    description = "Usuario encontrado",
+                    content = @Content(
+                                mediaType = "application/json",
+                                schema = @Schema(implementation = UsuarioDTO.class)
+                     )
+                            
+            ),
+             @ApiResponse(
+                        responseCode =  "404",
+                        description = "Usuario no encontrado"
+              )
+
+    })
+public ResponseEntity<UsuarioDTO> obtenerUsuarioPorCedula(
+        @Parameter(description = "Cedula del usuario a buscar", required = true, example = "1")
+        @PathVariable int cedula
+){
+    log.debug("GET /api/usuarios/{} - Buscando usuario por cedula", cedula);
+
+    try{
+        UsuarioDTO usuario = usuarioService.obtenerUsuarioPorCedula(cedula);
+        log.info("Usuario encontrado: {}", cedula);
+        return ResponseEntity.ok(usuario);                 
+        } catch (RuntimeException e){
+        log.warn("Usuario no encontrado con cedula: {}", cedula);
+        return ResponseEntity.notFound().build();
+    }
+}
+
+
+        @GetMapping
+        @Operation(
+                summary = "Listar todos los usuarios",
+                description = "Obtiene una lista de todos los usuarios registrados en el sistema"
+        )
+        @ApiResponses(value = {
+                @ApiResponse(
+                        responseCode = "200",
+                        description = "Lista de usuarios obtenida exitosamente",
+                        content = @Content(
+                                mediaType = "application/json",
+                                schema = @Schema(implementation = UsuarioDTO.class)
+                        )
+                )
+        })
+        public ResponseEntity<List<UsuarioDTO>> listarUsuarios() {
+            log.debug("GET /api/usuarios - Listando todos los usuarios");
+            List<UsuarioDTO> usuarios = usuarioService.listarUsuarios();
+            log.debug("Total usuarios encontrados: {}", usuarios.size());
+            return ResponseEntity.ok(usuarios); 
+        }
+
+
+
+
+
+
+
+
+
+
 }
