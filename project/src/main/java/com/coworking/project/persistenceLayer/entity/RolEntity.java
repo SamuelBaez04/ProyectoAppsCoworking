@@ -25,7 +25,7 @@ public class RolEntity {
 
     // Relación One-to-Many: Un rol puede tener muchos usuarios.
     // 'mappedBy' apunta al campo 'rolEntity' en UsuarioEntity.
-    @OneToMany(mappedBy = "rolEntity", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "rol", fetch = FetchType.LAZY)
     private List<UsuarioEntity> usuarios;
 
 }
