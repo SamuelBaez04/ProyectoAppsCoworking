@@ -90,9 +90,5 @@ public class RecursoServiceImpl implements RecursoService {
         return recursoDAO.findByEstado(estado);
     }
 
-    @Override
-    public List<RecursoDTO> buscarPorNombre(String nombreRecurso) {
-        log.debug("Buscando recursos por nombre: {}", nombreRecurso);
-        return recursoDAO.findByNombreRecurso(nombreRecurso);
-    }
+
 }

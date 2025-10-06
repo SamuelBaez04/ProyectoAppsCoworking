@@ -62,5 +62,4 @@ public interface RecursoService {
 
     List<RecursoDTO> buscarPorEstado(RecursoEstado estado);
 
-    List<RecursoDTO> buscarPorNombre(String nombreRecurso);
 }

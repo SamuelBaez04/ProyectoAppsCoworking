@@ -20,7 +20,7 @@ public interface RecursoRepository extends JpaRepository<RecursoEntity,Long> {
 
     Optional<RecursoEntity> findByIdRecurso(Long idRecurso);
 
-    List<RecursoEntity> findByNombreRecursoContainingIgnoreCase(String nombreRecurso);
+
 
     List<RecursoEntity> findByEstado(RecursoEstado estado);
 

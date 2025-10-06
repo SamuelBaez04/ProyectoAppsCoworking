@@ -3,6 +3,7 @@ package com.coworking.project.presentationLayer.controller;
 import com.coworking.project.businessLayer.dto.RecursoCreateDTO;
 import com.coworking.project.businessLayer.dto.RecursoDTO;
 import com.coworking.project.businessLayer.dto.RecursoUpdateDTO;
+import com.coworking.project.businessLayer.dto.UsuarioDTO;
 import com.coworking.project.businessLayer.service.RecursoService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -17,6 +18,8 @@ import org.apache.coyote.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/recursos")
@@ -147,10 +150,82 @@ public class RecursoController {
         }
     }
 
+    @GetMapping("/{idRecurso}")
+    @Operation(
+            summary = "Buscar recurso por su id",
+            description = "Obtiene un recurso y muestra su informacion"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Recurso encontrado",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = RecursoDTO.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Recurso no encontrado"
+            )
+    })
+    public ResponseEntity<RecursoDTO> obtenerRecursoPorId(
+            @Parameter(description = "Id del recurso", required = true, example = "1")
+            @PathVariable Long idRecurso
+    ){
+        log.debug("GET /api/recursos/{} - Buscando recurso por id", idRecurso);
+        try{
+            RecursoDTO recurso = recursoService.obtenerRecursoPorId(idRecurso);
+            log.info("Recurso encontrado: {}", idRecurso);
+            return ResponseEntity.ok(recurso);
+        }catch(RuntimeException e){
+            log.warn("Recurso no encontrado con ese id: {}", idRecurso);
+            return ResponseEntity.notFound().build();
+        }
+    }
 
+    @GetMapping
+    @Operation(
+            summary = "Listar todos los recursos",
+            description = "Obtiene una lista de todos los recursos registrados en el sistema"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Lista de recursos obtenida exitosamente",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = RecursoDTO.class)
+                    )
+            )
+    })
+    public ResponseEntity<List<RecursoDTO>> listarRecursos() {
+        log.debug("GET /api/recursos - Listando todos los recursos");
+        List<RecursoDTO> recursos = recursoService.listarRecursos();
+        log.debug("Total recursos encontrados: {}", recursos.size());
+        return ResponseEntity.ok(recursos);
+    }
 
+    @GetMapping("/activos")
+    @Operation(
+            summary = "Listar todos los recursos",
+            description = "Obtiene una lista de todos los recursos registrados en el sistema"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Lista de recursos obtenida exitosamente",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = RecursoDTO.class)
+                    )
+            )
+    })
+    public ResponseEntity<List<RecursoDTO>> listarActivos() {
+        log.debug("GET /api/recursos/activos - Listando todos los recursos");
+        List<RecursoDTO> recursos = recursoService.listarRecursosActivos();
+        log.debug("Total recursos activos encontrados: {}", recursos.size());
+        return ResponseEntity.ok(recursos);
+    }
 
-
-
-    
 }

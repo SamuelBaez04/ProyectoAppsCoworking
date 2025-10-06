@@ -63,10 +63,7 @@ public class RecursoDAO {
         return recursoMapper.toDTOList(entities);
     }
 
-    public List<RecursoDTO> findByNombreRecurso(String nombreRecurso){
-        List<RecursoEntity> entities = recursoRepository.findByNombreRecursoContainingIgnoreCase(nombreRecurso);
-        return recursoMapper.toDTOList(entities);
-    }
+
 
     public List<RecursoDTO> findActivos() {
         List<RecursoEntity> activos = recursoRepository.findByEstado(RecursoEstado.activo);
