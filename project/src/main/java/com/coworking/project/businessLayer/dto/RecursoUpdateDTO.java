@@ -14,10 +14,6 @@ import lombok.NoArgsConstructor;
 @Schema(description = "Datos necesarios para actualizar un Recurso")
 public class RecursoUpdateDTO {
 
-    @Schema(description = "Id unico del Recurso, auto incrementado", example = "1", required = true)
-    private Long idRecurso;
-
-
     @Schema(description = "Nombre del recurso", example = "Sala A - Primer Piso", required = true, maxLength = 50)
     private String nombreRecurso;
 
