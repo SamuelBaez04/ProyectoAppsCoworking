@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.coyote.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -112,5 +113,44 @@ public class RecursoController {
         }
     }
 
+    @DeleteMapping("/{idRecurso}")
+    @Operation(
+            summary = "Eliminar Recurso",
+            description = "Elimina un Recurso del sistema"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "204",
+                    description = "Recurso eliminado exitosamente"
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Recurso no encontrado"
+            )
+    })
+    public ResponseEntity<Void> eliminarRecurso(
+            @Parameter(description = "Cedula del usuario", required = true, example = "1")
+            @PathVariable Long idRecurso
+    ){
+        log.info("DELETE /api/recursos/{} - Eliminando Recurso", idRecurso);
+        try{
+            recursoService.eliminarRecurso(idRecurso);
+            log.info("Recurso eliminado exitosamente: {}", idRecurso);
+            return ResponseEntity.noContent().build();
+        }catch(RuntimeException e){
+            if(e.getMessage().contains("no encontrado")){
+                log.warn("Recurso no encontrado para eliminar id: {}", idRecurso);
+                return ResponseEntity.notFound().build();
+            }
+            log.error("Error al intentar eliminar un recurso id: {}", idRecurso, e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
 
+
+
+
+
+
+    
 }
