@@ -12,7 +12,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -28,7 +27,7 @@ import java.util.List;
 @RequestMapping("/api/usuarios")
 @RequiredArgsConstructor
 @Slf4j
-@Tag(name = "Usuarios", description = "Operaciones Crud para gestion de vendedores")
+@Tag(name = "Usuarios", description = "Operaciones Crud para gestion de usuarios")
 public class UsuarioController {
 
     private final UsuarioService usuarioService; // ← Inyección de la INTERFAZ
@@ -220,7 +219,7 @@ public ResponseEntity<UsuarioDTO> obtenerUsuarioPorCedula(
             return ResponseEntity.ok(usuarios); 
         }
 
-        @GetMapping("/email/{email}")
+        @GetMapping("/{email}")
         @Operation(
                 summary = "Buscar usuario por email",
                 description = "Obtiene la información completa de un usuario en especifico por su email"

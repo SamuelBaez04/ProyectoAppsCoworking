@@ -1,5 +1,6 @@
 package com.coworking.project.persistenceLayer.entity;
 
+import com.coworking.project.util.TipoRecurso;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -22,8 +23,9 @@ public class RecursoEntity {
     @Column(name = "id_recurso")
     private Long idRecurso; // Long es apropiado para un ID auto-generado
 
-    @Column(name = "tipo_recurso", nullable = false, length = 50)
-    private String tipoRecurso;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "tipo_recurso", length = 50)
+    private TipoRecurso tipoRecurso;
 
     @Column(name = "nombre_recurso", nullable = false, length = 100)
     private String nombreRecurso;
