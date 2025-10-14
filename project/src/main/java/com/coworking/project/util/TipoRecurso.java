@@ -9,4 +9,5 @@ public enum TipoRecurso {
     AUDITORIO,
     ZONA_COMUN,
     RECURSO_TECNOLOGICO
+
 }

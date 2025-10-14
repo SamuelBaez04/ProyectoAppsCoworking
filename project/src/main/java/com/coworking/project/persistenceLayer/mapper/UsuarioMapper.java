@@ -38,11 +38,7 @@ public interface UsuarioMapper {
     @Mapping(target = "rol", ignore = true)
     void updateEntityFromDTO(UsuarioUpdateDTO updateDTO, @MappingTarget UsuarioEntity entity);
 
-    default RolEntity map(Long idRol){
-        RolEntity rol = new RolEntity();
-        rol.setIdRol(idRol);
-        return rol;
-    }
+
     
 
 }

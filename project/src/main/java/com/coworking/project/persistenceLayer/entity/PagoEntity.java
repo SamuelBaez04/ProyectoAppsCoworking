@@ -17,7 +17,7 @@ public class PagoEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_pago")
-    private Integer idPago;
+    private int idPago;
 
     // Relación Many-to-One: Muchos pagos pueden pertenecer a una reserva.
     // Mapea la FK id_reserva
@@ -27,7 +27,7 @@ public class PagoEntity {
 
     // El tipo Double en Java es apropiado para el DECIMAL(10,2) en SQL.
     @Column(name = "monto", nullable = false)
-    private Double monto;
+    private double monto;
 
     // LocalDate en Java es el tipo estándar para el DATE en SQL.
     @Column(name = "fecha_pago", nullable = false)
