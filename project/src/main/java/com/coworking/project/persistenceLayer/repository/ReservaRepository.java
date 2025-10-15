@@ -2,6 +2,8 @@ package com.coworking.project.persistenceLayer.repository;
 
 
 import com.coworking.project.persistenceLayer.entity.ReservaEntity;
+import com.coworking.project.util.ReservaEstado;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -10,7 +12,7 @@ import java.util.List;
 
 public interface ReservaRepository extends JpaRepository<ReservaEntity, Integer> {
 
-    List<ReservaEntity> findByEstado(String estado);
+    List<ReservaEntity> findByEstado(ReservaEstado estado);
 
     List<ReservaEntity> findByUsuarioReservaCedula(int cedula);
 
