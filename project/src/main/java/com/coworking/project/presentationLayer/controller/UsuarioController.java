@@ -219,7 +219,7 @@ public ResponseEntity<UsuarioDTO> obtenerUsuarioPorCedula(
             return ResponseEntity.ok(usuarios); 
         }
 
-        @GetMapping("/{email}")
+        @GetMapping("/email/{email}")
         @Operation(
                 summary = "Buscar usuario por email",
                 description = "Obtiene la información completa de un usuario en especifico por su email"
