@@ -18,9 +18,10 @@ import lombok.extern.slf4j.Slf4j;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
+@Transactional(readOnly = false)
 @Slf4j
 public class ReservaServiceImpl implements ReservaService {
+
     private final ReservaDAO reservaDAO;
 
     @Override

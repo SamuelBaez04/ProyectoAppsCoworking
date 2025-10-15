@@ -11,7 +11,9 @@ import org.mapstruct.ReportingPolicy;
 import com.coworking.project.businessLayer.dto.ReservaCreateDTO;
 import com.coworking.project.businessLayer.dto.ReservaDTO;
 import com.coworking.project.businessLayer.dto.ReservaUpdateDTO;
+import com.coworking.project.persistenceLayer.entity.RecursoEntity;
 import com.coworking.project.persistenceLayer.entity.ReservaEntity;
+import com.coworking.project.persistenceLayer.entity.UsuarioEntity;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.WARN)
 
@@ -35,4 +37,19 @@ public interface ReservaMapper {
     @Mapping(target = "usuarioReserva", ignore = true)
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void updateEntityFromDTO(ReservaUpdateDTO updateDTO, @MappingTarget ReservaEntity reservaEntity);
+
+    default RecursoEntity mapIdToRecurso(Long id) {
+        if (id == null) return null;
+        RecursoEntity recurso = new RecursoEntity();
+        recurso.setIdRecurso(id);
+        return recurso;
+    }
+
+    default UsuarioEntity mapCedulaToUsuario(int cedula) {
+        if (cedula == 0) return null;
+        UsuarioEntity usuario = new UsuarioEntity();
+        usuario.setCedula(cedula);
+        return usuario;
+    }
+
 }
