@@ -49,3 +49,25 @@ CREATE TABLE Pagos (
     metodo_pago VARCHAR(50),
     FOREIGN KEY (id_reserva) REFERENCES Reservas(id_reserva)
 );
+
+CREATE TABLE Notificaciones (
+    id_notificacion INT AUTO_INCREMENT PRIMARY KEY,
+    cedula_usuario INT NOT NULL,
+    mensaje VARCHAR(500) NOT NULL,
+    fecha_envio DATETIME NOT NULL,
+    tipo_notificacion ENUM('CONFIRMACION', 'RECORDATORIO', 'ALERTA_VENCIMIENTO', 'GENERAL') NOT NULL DEFAULT 'GENERAL',
+    estado ENUM('PENDIENTE', 'ENVIADO', 'LEIDO') DEFAULT 'PENDIENTE',
+    FOREIGN KEY (cedula_usuario) REFERENCES Usuarios(cedula)
+);
+
+
+CREATE TABLE Reportes (
+    id_reporte INT AUTO_INCREMENT PRIMARY KEY,
+    titulo VARCHAR(100) NOT NULL,
+    descripcion VARCHAR(500),
+    fecha_generacion DATE NOT NULL,
+    tipo_reporte ENUM('OCUPACION', 'INGRESOS', 'USO_POR_USUARIO', 'RESERVAS', 'GENERAL' ) NOT NULL,
+    total_registros INT,
+    monto_total DECIMAL(10,2)
+);
+
