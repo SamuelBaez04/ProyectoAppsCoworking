@@ -49,18 +49,18 @@ public class ReporteController {
             @ApiResponse(responseCode = "400", description = "Datos inválidos"),
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
-    public ResponseEntity<ReporteDTO> crearReporte(
-            @Parameter(description = "Datos del reporte a crear", required = true) @RequestBody ReporteCreateDTO createDTO) {
-        log.info("POST /api/reportes - Creando nuevo reporte de tipo: {}", createDTO.getTipoReporte());
+    public ResponseEntity<ReporteDTO> crearReporte(@RequestBody ReporteCreateDTO createDTO) {
+        log.info("DTO recibido - tipoReporte: {}", createDTO.getTipoReporte());
+        log.info("DTO recibido - tipoReporte class: {}",
+                createDTO.getTipoReporte() != null ? createDTO.getTipoReporte().getClass() : "NULL");
+
         try {
             ReporteDTO created = reporteService.crearReporte(createDTO);
-            log.info("Reporte creado exitosamente con ID: {}", created.getIdReporte());
             return ResponseEntity.status(HttpStatus.CREATED).body(created);
-        } catch (IllegalArgumentException e) {
-            log.warn("Error de validación al crear reporte: {}", e.getMessage());
+        } catch (Exception e) {
+            log.error("Error: {}", e.getMessage(), e);
             return ResponseEntity.badRequest().build();
         }
-
     }
 
     @PutMapping("/{idReporte}")
