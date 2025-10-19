@@ -30,19 +30,7 @@ import com.coworking.project.businessLayer.service.impl.ReservaServiceImpl;
 import com.coworking.project.persistenceLayer.dao.ReservaDAO;
 import com.coworking.project.util.ReservaEstado;
 
-/**
- * Test unitario para ReservaServiceImpl
- * 
- * Valida la lógica de negocio del servicio de reservas incluyendo:
- * - Gestión completa CRUD de reservas
- * - Validaciones de fechas y horarios
- * - Búsquedas por diferentes criterios
- * - Manejo de estados de reservas
- * - Gestión de excepciones
- * 
- * @author Senior Java Developer
- * @version 1.0
- */
+
 @ExtendWith(MockitoExtension.class)
 @DisplayName("ReservaService - Pruebas Unitarias")
 class ReservaServiceTest {
@@ -53,7 +41,6 @@ class ReservaServiceTest {
     @InjectMocks
     private ReservaServiceImpl reservaService;
 
-    // Constantes para pruebas
     private static final int VALID_RESERVA_ID = 1;
     private static final int VALID_USUARIO_CEDULA = 123456789;
     private static final Long VALID_RECURSO_ID = 3L;
@@ -62,14 +49,12 @@ class ReservaServiceTest {
     private static final LocalTime HORA_INICIO = LocalTime.of(9, 0);
     private static final LocalTime HORA_FIN = LocalTime.of(11, 0);
 
-    // DTOs de prueba
     private ReservaCreateDTO validCreateDto;
     private ReservaUpdateDTO validUpdateDto;
     private ReservaDTO validReservaDto;
 
     @BeforeEach
     void setUp() {
-        // Setup ReservaCreateDTO
         validCreateDto = new ReservaCreateDTO();
         validCreateDto.setFechaInicio(FECHA_INICIO);
         validCreateDto.setHoraInicio(HORA_INICIO);
@@ -79,7 +64,6 @@ class ReservaServiceTest {
         validCreateDto.setIdRecurso(VALID_RECURSO_ID);
         validCreateDto.setUsuarioReserva(VALID_USUARIO_CEDULA);
 
-        // Setup ReservaUpdateDTO
         validUpdateDto = new ReservaUpdateDTO();
         validUpdateDto.setFechaInicio(FECHA_INICIO.plusDays(1));
         validUpdateDto.setHoraInicio(HORA_INICIO.plusHours(1));
@@ -87,7 +71,6 @@ class ReservaServiceTest {
         validUpdateDto.setHoraFin(HORA_FIN.plusHours(1));
         validUpdateDto.setEstado(ReservaEstado.confirmada);
 
-        // Setup ReservaDTO
         validReservaDto = new ReservaDTO();
         validReservaDto.setIdReserva(VALID_RESERVA_ID);
         validReservaDto.setFechaInicio(FECHA_INICIO);
@@ -106,13 +89,10 @@ class ReservaServiceTest {
         @Test
         @DisplayName("Debería crear reserva exitosamente con datos válidos")
         void deberiaCrearReservaExitosamenteConDatosValidos() {
-            // Arrange
             given(reservaDAO.createReserva(any(ReservaCreateDTO.class))).willReturn(validReservaDto);
 
-            // Act
             ReservaDTO resultado = reservaService.crearReserva(validCreateDto);
 
-            // Assert
             assertThat(resultado).isNotNull();
             assertThat(resultado.getIdReserva()).isEqualTo(VALID_RESERVA_ID);
             assertThat(resultado.getFechaInicio()).isEqualTo(FECHA_INICIO);
@@ -121,21 +101,18 @@ class ReservaServiceTest {
             assertThat(resultado.getUsuarioReserva()).isEqualTo(VALID_USUARIO_CEDULA);
             assertThat(resultado.getEstado()).isEqualTo(ReservaEstado.pendiente);
 
-            // Verify
             then(reservaDAO).should().createReserva(validCreateDto);
         }
 
         @Test
         @DisplayName("Debería pasar los datos correctos al DAO")
         void deberiaPasarLosDatosCorrectosAlDAO() {
-            // Arrange
+
             ArgumentCaptor<ReservaCreateDTO> captor = ArgumentCaptor.forClass(ReservaCreateDTO.class);
             given(reservaDAO.createReserva(any(ReservaCreateDTO.class))).willReturn(validReservaDto);
 
-            // Act
             reservaService.crearReserva(validCreateDto);
 
-            // Assert
             then(reservaDAO).should().createReserva(captor.capture());
             ReservaCreateDTO captured = captor.getValue();
             
@@ -150,11 +127,10 @@ class ReservaServiceTest {
         @Test
         @DisplayName("Debería manejar excepción cuando el DAO falla")
         void deberiaManejarExcepcionCuandoElDAOFalla() {
-            // Arrange
+
             given(reservaDAO.createReserva(any(ReservaCreateDTO.class)))
                 .willThrow(new RuntimeException("Error en base de datos"));
 
-            // Act & Assert
             assertThatThrownBy(() -> reservaService.crearReserva(validCreateDto))
                 .isInstanceOf(RuntimeException.class)
                 .hasMessage("Error en base de datos");
@@ -170,13 +146,12 @@ class ReservaServiceTest {
         @Test
         @DisplayName("Debería obtener reserva exitosamente por ID válido")
         void deberiaObtenerReservaExitosamentePorIdValido() {
-            // Arrange
+
             given(reservaDAO.findById(VALID_RESERVA_ID)).willReturn(Optional.of(validReservaDto));
 
-            // Act
+
             ReservaDTO resultado = reservaService.obtenerReservaPorId(VALID_RESERVA_ID);
 
-            // Assert
             assertThat(resultado).isNotNull();
             assertThat(resultado.getIdReserva()).isEqualTo(VALID_RESERVA_ID);
             assertThat(resultado.getFechaInicio()).isEqualTo(FECHA_INICIO);
@@ -188,11 +163,9 @@ class ReservaServiceTest {
         @Test
         @DisplayName("Debería lanzar excepción cuando la reserva no existe")
         void deberiaLanzarExcepcionCuandoLaReservaNoExiste() {
-            // Arrange
             int idInexistente = 999;
             given(reservaDAO.findById(idInexistente)).willReturn(Optional.empty());
 
-            // Act & Assert
             assertThatThrownBy(() -> reservaService.obtenerReservaPorId(idInexistente))
                 .isInstanceOf(RuntimeException.class)
                 .hasMessage("Reserva no encontrada con ID: " + idInexistente);
@@ -208,7 +181,6 @@ class ReservaServiceTest {
         @Test
         @DisplayName("Debería obtener lista de reservas exitosamente")
         void deberiaObtenerListaDeReservasExitosamente() {
-            // Arrange
             ReservaDTO reserva2 = new ReservaDTO();
             reserva2.setIdReserva(2);
             reserva2.setEstado(ReservaEstado.confirmada);
@@ -216,10 +188,8 @@ class ReservaServiceTest {
             List<ReservaDTO> reservasEsperadas = Arrays.asList(validReservaDto, reserva2);
             given(reservaDAO.findAll()).willReturn(reservasEsperadas);
 
-            // Act
             List<ReservaDTO> resultado = reservaService.listarReservas();
 
-            // Assert
             assertThat(resultado).isNotNull();
             assertThat(resultado).hasSize(2);
             assertThat(resultado.get(0).getIdReserva()).isEqualTo(VALID_RESERVA_ID);
@@ -231,13 +201,10 @@ class ReservaServiceTest {
         @Test
         @DisplayName("Debería retornar lista vacía cuando no hay reservas")
         void deberiaRetornarListaVaciaCuandoNoHayReservas() {
-            // Arrange
             given(reservaDAO.findAll()).willReturn(Collections.emptyList());
 
-            // Act
             List<ReservaDTO> resultado = reservaService.listarReservas();
 
-            // Assert
             assertThat(resultado).isNotNull();
             assertThat(resultado).isEmpty();
 
@@ -252,7 +219,7 @@ class ReservaServiceTest {
         @Test
         @DisplayName("Debería actualizar reserva exitosamente")
         void deberiaActualizarReservaExitosamente() {
-            // Arrange
+            
             ReservaDTO reservaActualizada = new ReservaDTO();
             reservaActualizada.setIdReserva(VALID_RESERVA_ID);
             reservaActualizada.setEstado(ReservaEstado.confirmada);
@@ -261,10 +228,8 @@ class ReservaServiceTest {
             given(reservaDAO.update(eq(VALID_RESERVA_ID), any(ReservaUpdateDTO.class)))
                 .willReturn(Optional.of(reservaActualizada));
 
-            // Act
             ReservaDTO resultado = reservaService.actualizarReserva(VALID_RESERVA_ID, validUpdateDto);
 
-            // Assert
             assertThat(resultado).isNotNull();
             assertThat(resultado.getIdReserva()).isEqualTo(VALID_RESERVA_ID);
             assertThat(resultado.getEstado()).isEqualTo(ReservaEstado.confirmada);
@@ -275,12 +240,10 @@ class ReservaServiceTest {
         @Test
         @DisplayName("Debería lanzar excepción cuando la reserva a actualizar no existe")
         void deberiaLanzarExcepcionCuandoLaReservaAActualizarNoExiste() {
-            // Arrange
             int idInexistente = 999;
             given(reservaDAO.update(eq(idInexistente), any(ReservaUpdateDTO.class)))
                 .willReturn(Optional.empty());
 
-            // Act & Assert
             assertThatThrownBy(() -> reservaService.actualizarReserva(idInexistente, validUpdateDto))
                 .isInstanceOf(RuntimeException.class)
                 .hasMessage("Reserva no encontrada con ID: " + idInexistente);
@@ -291,15 +254,13 @@ class ReservaServiceTest {
         @Test
         @DisplayName("Debería pasar los datos de actualización correctos al DAO")
         void deberiaPasarLosDatosDeActualizacionCorrectosAlDAO() {
-            // Arrange
+
             ArgumentCaptor<ReservaUpdateDTO> captor = ArgumentCaptor.forClass(ReservaUpdateDTO.class);
             given(reservaDAO.update(eq(VALID_RESERVA_ID), any(ReservaUpdateDTO.class)))
                 .willReturn(Optional.of(validReservaDto));
 
-            // Act
             reservaService.actualizarReserva(VALID_RESERVA_ID, validUpdateDto);
 
-            // Assert
             then(reservaDAO).should().update(eq(VALID_RESERVA_ID), captor.capture());
             ReservaUpdateDTO captured = captor.getValue();
             
@@ -316,13 +277,10 @@ class ReservaServiceTest {
         @Test
         @DisplayName("Debería eliminar reserva exitosamente")
         void deberiaEliminarReservaExitosamente() {
-            // Arrange
             given(reservaDAO.deleteById(VALID_RESERVA_ID)).willReturn(true);
 
-            // Act
             boolean resultado = reservaService.eliminarReserva(VALID_RESERVA_ID);
 
-            // Assert
             assertThat(resultado).isTrue();
 
             then(reservaDAO).should().deleteById(VALID_RESERVA_ID);
@@ -331,11 +289,9 @@ class ReservaServiceTest {
         @Test
         @DisplayName("Debería lanzar excepción cuando la reserva a eliminar no existe")
         void deberiaLanzarExcepcionCuandoLaReservaAEliminarNoExiste() {
-            // Arrange
             int idInexistente = 999;
             given(reservaDAO.deleteById(idInexistente)).willReturn(false);
 
-            // Act & Assert
             assertThatThrownBy(() -> reservaService.eliminarReserva(idInexistente))
                 .isInstanceOf(RuntimeException.class)
                 .hasMessage("Reserva no encontrada con ID: " + idInexistente);
@@ -351,15 +307,12 @@ class ReservaServiceTest {
         @Test
         @DisplayName("Debería buscar reservas por estado exitosamente")
         void deberiaBuscarReservasPorEstadoExitosamente() {
-            // Arrange
             ReservaEstado estado = ReservaEstado.confirmada;
             List<ReservaDTO> reservasEsperadas = Arrays.asList(validReservaDto);
             given(reservaDAO.findByEstado(estado)).willReturn(reservasEsperadas);
 
-            // Act
             List<ReservaDTO> resultado = reservaService.buscarPorEstado(estado);
 
-            // Assert
             assertThat(resultado).isNotNull();
             assertThat(resultado).hasSize(1);
             assertThat(resultado.get(0).getIdReserva()).isEqualTo(VALID_RESERVA_ID);
@@ -370,14 +323,11 @@ class ReservaServiceTest {
         @Test
         @DisplayName("Debería buscar reservas por usuario exitosamente")
         void deberiaBuscarReservasPorUsuarioExitosamente() {
-            // Arrange
             List<ReservaDTO> reservasEsperadas = Arrays.asList(validReservaDto);
             given(reservaDAO.findByUsuario(VALID_USUARIO_CEDULA)).willReturn(reservasEsperadas);
 
-            // Act
             List<ReservaDTO> resultado = reservaService.buscarPorUsuario(VALID_USUARIO_CEDULA);
 
-            // Assert
             assertThat(resultado).isNotNull();
             assertThat(resultado).hasSize(1);
             assertThat(resultado.get(0).getUsuarioReserva()).isEqualTo(VALID_USUARIO_CEDULA);
@@ -388,14 +338,12 @@ class ReservaServiceTest {
         @Test
         @DisplayName("Debería buscar reservas por recurso exitosamente")
         void deberiaBuscarReservasPorRecursoExitosamente() {
-            // Arrange
+
             List<ReservaDTO> reservasEsperadas = Arrays.asList(validReservaDto);
             given(reservaDAO.findByRecurso(VALID_RECURSO_ID)).willReturn(reservasEsperadas);
 
-            // Act
             List<ReservaDTO> resultado = reservaService.buscarPorRecurso(VALID_RECURSO_ID);
 
-            // Assert
             assertThat(resultado).isNotNull();
             assertThat(resultado).hasSize(1);
             assertThat(resultado.get(0).getIdRecurso()).isEqualTo(VALID_RECURSO_ID);
@@ -406,16 +354,14 @@ class ReservaServiceTest {
         @Test
         @DisplayName("Debería buscar reservas por rango de fechas exitosamente")
         void deberiaBuscarReservasPorRangoDeFechasExitosamente() {
-            // Arrange
+
             LocalDate fechaInicio = LocalDate.of(2025, 10, 1);
             LocalDate fechaFin = LocalDate.of(2025, 10, 31);
             List<ReservaDTO> reservasEsperadas = Arrays.asList(validReservaDto);
             given(reservaDAO.findByRangoFechas(fechaInicio, fechaFin)).willReturn(reservasEsperadas);
 
-            // Act
             List<ReservaDTO> resultado = reservaService.buscarPorRangoDeFechas(fechaInicio, fechaFin);
 
-            // Assert
             assertThat(resultado).isNotNull();
             assertThat(resultado).hasSize(1);
             assertThat(resultado.get(0).getFechaInicio()).isEqualTo(FECHA_INICIO);
@@ -426,14 +372,11 @@ class ReservaServiceTest {
         @Test
         @DisplayName("Debería retornar lista vacía cuando no hay reservas que coincidan con estado")
         void deberiaRetornarListaVaciaCuandoNoHayReservasQueCoincidanConEstado() {
-            // Arrange
             ReservaEstado estado = ReservaEstado.cancelada;
             given(reservaDAO.findByEstado(estado)).willReturn(Collections.emptyList());
 
-            // Act
             List<ReservaDTO> resultado = reservaService.buscarPorEstado(estado);
 
-            // Assert
             assertThat(resultado).isNotNull();
             assertThat(resultado).isEmpty();
 
@@ -443,14 +386,11 @@ class ReservaServiceTest {
         @Test
         @DisplayName("Debería retornar lista vacía cuando usuario no tiene reservas")
         void deberiaRetornarListaVaciaCuandoUsuarioNoTieneReservas() {
-            // Arrange
             int usuarioSinReservas = 999999999;
             given(reservaDAO.findByUsuario(usuarioSinReservas)).willReturn(Collections.emptyList());
 
-            // Act
             List<ReservaDTO> resultado = reservaService.buscarPorUsuario(usuarioSinReservas);
 
-            // Assert
             assertThat(resultado).isNotNull();
             assertThat(resultado).isEmpty();
 
@@ -465,7 +405,7 @@ class ReservaServiceTest {
         @Test
         @DisplayName("Debería manejar correctamente los diferentes estados de reserva")
         void deberiaManejarCorrectamenteLosDistintosEstadosDeReserva() {
-            // Arrange & Act & Assert para cada estado
+
             for (ReservaEstado estado : ReservaEstado.values()) {
                 List<ReservaDTO> reservasEsperadas = Arrays.asList(validReservaDto);
                 given(reservaDAO.findByEstado(estado)).willReturn(reservasEsperadas);
@@ -482,7 +422,7 @@ class ReservaServiceTest {
         @Test
         @DisplayName("Debería validar que se pasan los parámetros correctos para búsqueda por rango")
         void deberiaValidarQueSeparanLosParametrosCorrectosParaBusquedaPorRango() {
-            // Arrange
+
             LocalDate fechaInicio = LocalDate.of(2025, 1, 1);
             LocalDate fechaFin = LocalDate.of(2025, 12, 31);
             ArgumentCaptor<LocalDate> inicioCaptor = ArgumentCaptor.forClass(LocalDate.class);
@@ -491,10 +431,8 @@ class ReservaServiceTest {
             given(reservaDAO.findByRangoFechas(any(LocalDate.class), any(LocalDate.class)))
                 .willReturn(Collections.emptyList());
 
-            // Act
             reservaService.buscarPorRangoDeFechas(fechaInicio, fechaFin);
 
-            // Assert
             then(reservaDAO).should().findByRangoFechas(inicioCaptor.capture(), finCaptor.capture());
             
             assertThat(inicioCaptor.getValue()).isEqualTo(fechaInicio);

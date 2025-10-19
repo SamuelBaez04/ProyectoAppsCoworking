@@ -23,17 +23,10 @@ configurations {
 
 repositories {
 	mavenCentral()
-	gradlePluginPortal() // Para auto-download de toolchains
+	gradlePluginPortal() 
 }
 
-// Configuración unificada para Java 24 - Comentada la configuración conflictiva
-// plugins.withType(JavaPlugin).configureEach {
-// 	project.tasks.withType(JavaCompile).configureEach { task ->
-// 		task.javaCompiler = javaToolchains.compilerFor {
-// 			languageVersion = JavaLanguageVersion.of(21)
-// 		}
-// 	}
-// }
+
 
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
@@ -43,7 +36,7 @@ dependencies {
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-	testRuntimeOnly 'com.h2database:h2' // Base de datos en memoria para tests
+	testRuntimeOnly 'com.h2database:h2' 
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.6.0'
 	implementation 'com.microsoft.sqlserver:mssql-jdbc'
     implementation 'org.mapstruct:mapstruct:1.6.3'
@@ -53,16 +46,11 @@ dependencies {
 
 tasks.named('test') {
 	useJUnitPlatform()
-	finalizedBy jacocoTestReport // Genera reporte después de tests
-}
-
-// Configuración de JaCoCo para Coverage
-jacoco {
-	toolVersion = "0.8.11" // Versión más reciente compatible con Java 24
+	finalizedBy jacocoTestReport 
 }
 
 jacocoTestReport {
-	dependsOn test // Tests deben ejecutarse antes del reporte
+	dependsOn test 
 	
 	reports {
 		xml.required = true
@@ -74,10 +62,10 @@ jacocoTestReport {
 	afterEvaluate {
 		classDirectories.setFrom(files(classDirectories.files.collect {
 			fileTree(dir: it, exclude: [
-				'**/*Application.*', // Excluir main class
-				'**/*Config.*',      // Excluir configuraciones
-				'**/*Entity.*',      // Excluir entidades JPA
-				'**/*DTO.*',         // Excluir DTOs
+				'**/*Application.*', 
+				'**/*Config.*',      
+				'**/*Entity.*',      
+				'**/*DTO.*',        
 				'**/dto/**',
 				'**/entity/**',
 				'**/config/**'
@@ -94,7 +82,7 @@ jacocoTestCoverageVerification {
 			limit {
 				counter = 'INSTRUCTION'
 				value = 'COVEREDRATIO'
-				minimum = 0.80 // 80% mínimo de cobertura
+				minimum = 0.80 
 			}
 		}
 		
@@ -102,7 +90,7 @@ jacocoTestCoverageVerification {
 			limit {
 				counter = 'BRANCH' 
 				value = 'COVEREDRATIO'
-				minimum = 0.75 // 75% mínimo cobertura de branches
+				minimum = 0.75 
 			}
 		}
 	}

@@ -26,28 +26,17 @@ import com.coworking.project.businessLayer.dto.UsuarioUpdateDTO;
 import com.coworking.project.businessLayer.service.impl.UsuarioServiceImpl;
 import com.coworking.project.persistenceLayer.dao.UsuarioDAO;
 
-/**
- * Unit Tests para UsuarioServiceImpl
- * 
- * Utiliza AAA Pattern (Arrange-Act-Assert) y BDD style assertions
- * Cobertura completa de casos de éxito y casos de error
- * Mockea el DAO layer para aislar la lógica de negocio
- * 
- * @author Test Automation
- * @version 1.0
- */
+
 @ExtendWith(MockitoExtension.class)
 @DisplayName("UsuarioService Tests - Business Logic with DAO Layer")
 class UsuarioServiceTestFinal {
 
-    // === MOCKS ===
     @Mock
     private UsuarioDAO usuarioDAO;
     
     @InjectMocks
     private UsuarioServiceImpl usuarioService;
 
-    // === TEST DATA ===
     private static final Integer VALID_CEDULA = 123456789;
     private static final Integer VALID_ID_ROL = 1;
     private static final String VALID_EMAIL = "juan.perez@example.com";
@@ -58,9 +47,7 @@ class UsuarioServiceTestFinal {
 
     @BeforeEach
     void setUp() {
-        // Arrange - Setup valid test data objects
 
-        // Setup valid UsuarioCreateDTO
         validCreateDto = new UsuarioCreateDTO();
         validCreateDto.setCedula(VALID_CEDULA);
         validCreateDto.setNombreCompleto("Juan Carlos Perez");
@@ -70,7 +57,6 @@ class UsuarioServiceTestFinal {
         validCreateDto.setTelefono("3001234567");
         validCreateDto.setEmail(VALID_EMAIL);
 
-        // Setup valid UsuarioDTO (response)
         validUsuarioDto = new UsuarioDTO();
         validUsuarioDto.setCedula(VALID_CEDULA);
         validUsuarioDto.setNombreCompleto("Juan Carlos Perez");
@@ -79,7 +65,6 @@ class UsuarioServiceTestFinal {
         validUsuarioDto.setTelefono("3001234567");
         validUsuarioDto.setEmail(VALID_EMAIL);
 
-        // Setup valid UsuarioUpdateDTO
         validUpdateDto = new UsuarioUpdateDTO();
         validUpdateDto.setNombreCompleto("Juan Carlos Perez Actualizado");
         validUpdateDto.setTelefono("3001234568");

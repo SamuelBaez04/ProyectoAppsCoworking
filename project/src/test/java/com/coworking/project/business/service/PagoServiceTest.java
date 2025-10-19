@@ -31,20 +31,7 @@ import com.coworking.project.businessLayer.dto.PagoUpdateDTO;
 import com.coworking.project.businessLayer.service.impl.PagoServiceImpl;
 import com.coworking.project.persistenceLayer.dao.PagoDAO;
 
-/**
- * Test unitario para PagoServiceImpl
- * 
- * Valida la lógica de negocio del servicio de pagos incluyendo:
- * - Gestión completa CRUD de pagos
- * - Validaciones de montos y métodos de pago
- * - Cálculos financieros y totales
- * - Búsquedas por diferentes criterios
- * - Gestión de transacciones monetarias
- * - Manejo de excepciones
- * 
- * @author Senior Java Developer
- * @version 1.0
- */
+
 @ExtendWith(MockitoExtension.class)
 @DisplayName("PagoService - Pruebas Unitarias")
 class PagoServiceTest {
@@ -55,7 +42,6 @@ class PagoServiceTest {
     @InjectMocks
     private PagoServiceImpl pagoService;
 
-    // Constantes para pruebas
     private static final int VALID_PAGO_ID = 1;
     private static final int VALID_RESERVA_ID = 10;
     private static final double VALID_MONTO = 150.0;
@@ -64,27 +50,24 @@ class PagoServiceTest {
     private static final String METODO_EFECTIVO = "Efectivo";
     private static final String METODO_TRANSFERENCIA = "Transferencia bancaria";
 
-    // DTOs de prueba
     private PagoCreateDTO validCreateDto;
     private PagoUpdateDTO validUpdateDto;
     private PagoDTO validPagoDto;
 
     @BeforeEach
     void setUp() {
-        // Setup PagoCreateDTO
+        
         validCreateDto = new PagoCreateDTO();
         validCreateDto.setIdReserva(VALID_RESERVA_ID);
         validCreateDto.setMonto(VALID_MONTO);
         validCreateDto.setFechaPago(FECHA_PAGO);
         validCreateDto.setMetodoPago(METODO_TARJETA);
 
-        // Setup PagoUpdateDTO
         validUpdateDto = new PagoUpdateDTO();
         validUpdateDto.setMonto(200.0);
         validUpdateDto.setFechaPago(FECHA_PAGO.plusDays(1));
         validUpdateDto.setMetodoPago(METODO_EFECTIVO);
 
-        // Setup PagoDTO
         validPagoDto = new PagoDTO();
         validPagoDto.setIdPago(VALID_PAGO_ID);
         validPagoDto.setIdReserva(VALID_RESERVA_ID);
@@ -100,13 +83,11 @@ class PagoServiceTest {
         @Test
         @DisplayName("Debería crear pago exitosamente con datos válidos")
         void deberiaCrearPagoExitosamenteConDatosValidos() {
-            // Arrange
+
             given(pagoDAO.createPago(any(PagoCreateDTO.class))).willReturn(validPagoDto);
 
-            // Act
             PagoDTO resultado = pagoService.crearPago(validCreateDto);
 
-            // Assert
             assertThat(resultado).isNotNull();
             assertThat(resultado.getIdPago()).isEqualTo(VALID_PAGO_ID);
             assertThat(resultado.getIdReserva()).isEqualTo(VALID_RESERVA_ID);
@@ -114,21 +95,18 @@ class PagoServiceTest {
             assertThat(resultado.getFechaPago()).isEqualTo(FECHA_PAGO);
             assertThat(resultado.getMetodoPago()).isEqualTo(METODO_TARJETA);
 
-            // Verify
             then(pagoDAO).should().createPago(validCreateDto);
         }
 
         @Test
         @DisplayName("Debería pasar los datos correctos al DAO")
         void deberiaPasarLosDatosCorrectosAlDAO() {
-            // Arrange
+
             ArgumentCaptor<PagoCreateDTO> captor = ArgumentCaptor.forClass(PagoCreateDTO.class);
             given(pagoDAO.createPago(any(PagoCreateDTO.class))).willReturn(validPagoDto);
 
-            // Act
             pagoService.crearPago(validCreateDto);
 
-            // Assert
             then(pagoDAO).should().createPago(captor.capture());
             PagoCreateDTO captured = captor.getValue();
             
@@ -150,7 +128,6 @@ class PagoServiceTest {
 
             given(pagoDAO.createPago(any(PagoCreateDTO.class))).willReturn(validPagoDto);
 
-            // Act & Assert - El servicio debería aceptar cualquier valor (la validación podría estar en el DAO o controller)
             PagoDTO resultado = pagoService.crearPago(pagoConMontoNegativo);
             
             assertThat(resultado).isNotNull();
@@ -160,11 +137,10 @@ class PagoServiceTest {
         @Test
         @DisplayName("Debería manejar excepción cuando el DAO falla")
         void deberiaManejarExcepcionCuandoElDAOFalla() {
-            // Arrange
+
             given(pagoDAO.createPago(any(PagoCreateDTO.class)))
                 .willThrow(new RuntimeException("Error en base de datos"));
 
-            // Act & Assert
             assertThatThrownBy(() -> pagoService.crearPago(validCreateDto))
                 .isInstanceOf(RuntimeException.class)
                 .hasMessage("Error en base de datos");
@@ -180,13 +156,11 @@ class PagoServiceTest {
         @Test
         @DisplayName("Debería obtener pago exitosamente por ID válido")
         void deberiaObtenerPagoExitosamentePorIdValido() {
-            // Arrange
+
             given(pagoDAO.findById(VALID_PAGO_ID)).willReturn(Optional.of(validPagoDto));
 
-            // Act
             PagoDTO resultado = pagoService.obtenerPagoPorId(VALID_PAGO_ID);
 
-            // Assert
             assertThat(resultado).isNotNull();
             assertThat(resultado.getIdPago()).isEqualTo(VALID_PAGO_ID);
             assertThat(resultado.getMonto()).isEqualTo(VALID_MONTO);
@@ -510,7 +484,7 @@ class PagoServiceTest {
         @Test
         @DisplayName("Debería validar correctamente diferentes métodos de pago")
         void deberiaValidarCorrectamenteDiferentesMetodosDePago() {
-            // Arrange & Act & Assert para cada método
+
             String[] metodosPago = {METODO_TARJETA, METODO_EFECTIVO, METODO_TRANSFERENCIA};
             
             for (String metodo : metodosPago) {
@@ -538,12 +512,10 @@ class PagoServiceTest {
             given(pagoDAO.findByFechaPago(any(LocalDate.class))).willReturn(Collections.emptyList());
             given(pagoDAO.findByMetodoPago(anyString())).willReturn(Collections.emptyList());
 
-            // Act
             pagoService.obtenerPagosPorReserva(VALID_RESERVA_ID);
             pagoService.obtenerPagosPorFecha(FECHA_PAGO);
             pagoService.obtenerPagosPorMetodo(METODO_TARJETA);
 
-            // Assert
             then(pagoDAO).should().findByReserva(reservaCaptor.capture());
             then(pagoDAO).should().findByFechaPago(fechaCaptor.capture());
             then(pagoDAO).should().findByMetodoPago(metodoCaptor.capture());
@@ -556,7 +528,6 @@ class PagoServiceTest {
         @Test
         @DisplayName("Debería manejar pagos con diferentes montos correctamente")
         void deberiaManejarPagosConDiferentesMontos() {
-            // Arrange
             PagoDTO pagoGrande = new PagoDTO();
             pagoGrande.setIdPago(2);
             pagoGrande.setMonto(1000.0);
@@ -568,11 +539,9 @@ class PagoServiceTest {
             given(pagoDAO.findById(2)).willReturn(Optional.of(pagoGrande));
             given(pagoDAO.findById(3)).willReturn(Optional.of(pagoPequeño));
 
-            // Act
             PagoDTO resultadoGrande = pagoService.obtenerPagoPorId(2);
             PagoDTO resultadoPequeño = pagoService.obtenerPagoPorId(3);
 
-            // Assert
             assertThat(resultadoGrande.getMonto()).isEqualTo(1000.0);
             assertThat(resultadoPequeño.getMonto()).isEqualTo(0.01);
         }

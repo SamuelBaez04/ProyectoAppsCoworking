@@ -29,20 +29,7 @@ import com.coworking.project.businessLayer.service.impl.ReporteServiceImpl;
 import com.coworking.project.persistenceLayer.dao.ReporteDAO;
 import com.coworking.project.util.TipoReporte;
 
-/**
- * Unit Tests para ReporteServiceImpl
- *
- * OBJETIVO: Probar la lógica de negocio del servicio de forma aislada
- * - No requiere base de datos
- * - No requiere Spring Context
- * - Usa mocks para dependencias
- * - Ejecución rápida
- * 
- * Estructura AAA:
- * - Arrange: Configuración de datos y mocks
- * - Act: Ejecutar método bajo prueba
- * - Assert: Verificar resultado y comportamiento
- */
+
 @ExtendWith(MockitoExtension.class)
 @DisplayName("ReporteService - Unit Tests")
 public class ReporteServiceTest {
@@ -62,7 +49,6 @@ public class ReporteServiceTest {
     void setUp() {
         validReporteId = 1;
         
-        // Setup valid ReporteCreateDTO
         validCreateDTO = new ReporteCreateDTO();
         validCreateDTO.setTitulo("Reporte de Ingresos Mensual");
         validCreateDTO.setDescripcion("Informe detallado de ingresos");
@@ -71,7 +57,6 @@ public class ReporteServiceTest {
         validCreateDTO.setTotalRegistros(45);
         validCreateDTO.setMontoTotal(12500.50);
         
-        // Setup valid ReporteDTO
         validReporteDTO = new ReporteDTO();
         validReporteDTO.setIdReporte(validReporteId);
         validReporteDTO.setTitulo(validCreateDTO.getTitulo());
@@ -81,7 +66,6 @@ public class ReporteServiceTest {
         validReporteDTO.setTotalRegistros(validCreateDTO.getTotalRegistros());
         validReporteDTO.setMontoTotal(validCreateDTO.getMontoTotal());
         
-        // Setup valid ReporteUpdateDTO
         validUpdateDTO = new ReporteUpdateDTO();
         validUpdateDTO.setTitulo("Reporte Actualizado");
         validUpdateDTO.setDescripcion("Descripción actualizada");
@@ -94,7 +78,7 @@ public class ReporteServiceTest {
         @Test
         @DisplayName("CREATE - reporte válido retorna reporte creado")
         void crearReporte_validData_returnsCreatedReporte() {
-            // Arrange
+
             ReporteCreateDTO toCreate = new ReporteCreateDTO();
             toCreate.setTitulo("Nuevo Reporte");
             toCreate.setTipoReporte(TipoReporte.OCUPACION);
@@ -107,17 +91,14 @@ public class ReporteServiceTest {
 
             when(reporteDAO.createReporte(any(ReporteCreateDTO.class))).thenReturn(persisted);
 
-            // Act
             ReporteDTO result = reporteService.crearReporte(toCreate);
 
-            // Assert - estado
             assertThat(result).isNotNull();
             assertThat(result.getIdReporte()).isEqualTo(validReporteId);
             assertThat(result.getTitulo()).isEqualTo(toCreate.getTitulo());
             assertThat(result.getTipoReporte()).isEqualTo(toCreate.getTipoReporte());
             assertThat(result.getFechaGeneracion()).isNotNull();
 
-            // Assert - comportamiento
             ArgumentCaptor<ReporteCreateDTO> captor = ArgumentCaptor.forClass(ReporteCreateDTO.class);
             verify(reporteDAO, times(1)).createReporte(captor.capture());
             ReporteCreateDTO passed = captor.getValue();
@@ -128,7 +109,7 @@ public class ReporteServiceTest {
         @Test
         @DisplayName("CREATE - fecha generación null se asigna automáticamente")
         void crearReporte_nullFechaGeneracion_assignsCurrentDate() {
-            // Arrange
+
             ReporteCreateDTO toCreate = new ReporteCreateDTO();
             toCreate.setTitulo("Reporte Sin Fecha");
             toCreate.setTipoReporte(TipoReporte.GENERAL);
@@ -140,10 +121,8 @@ public class ReporteServiceTest {
 
             when(reporteDAO.createReporte(any(ReporteCreateDTO.class))).thenReturn(persisted);
 
-            // Act
             ReporteDTO result = reporteService.crearReporte(toCreate);
 
-            // Assert
             assertThat(result.getFechaGeneracion()).isEqualTo(LocalDate.now());
             
             ArgumentCaptor<ReporteCreateDTO> captor = ArgumentCaptor.forClass(ReporteCreateDTO.class);
@@ -160,13 +139,10 @@ public class ReporteServiceTest {
         @Test
         @DisplayName("GET by id - reporte existente retorna DTO")
         void obtenerReportePorId_existing_returnsReporte() {
-            // Arrange
             when(reporteDAO.findById(validReporteId)).thenReturn(Optional.of(validReporteDTO));
 
-            // Act
             ReporteDTO result = reporteService.obtenerReportePorId(validReporteId);
 
-            // Assert
             assertThat(result).isNotNull();
             assertThat(result.getIdReporte()).isEqualTo(validReporteId);
             assertThat(result.getTitulo()).isEqualTo(validReporteDTO.getTitulo());
