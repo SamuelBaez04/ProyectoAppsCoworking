@@ -2,6 +2,7 @@ plugins {
 	id 'java'
 	id 'org.springframework.boot' version '3.5.5'
 	id 'io.spring.dependency-management' version '1.1.7'
+	id 'jacoco'
 }
 
 group = 'com.coworking'
@@ -10,7 +11,7 @@ description = 'Demo project for Spring Boot'
 
 java {
 	toolchain {
-		languageVersion = JavaLanguageVersion.of(24)
+		languageVersion = JavaLanguageVersion.of(24) // Mantenemos Java 24 por estabilidad
 	}
 }
 
@@ -22,7 +23,17 @@ configurations {
 
 repositories {
 	mavenCentral()
+	gradlePluginPortal() // Para auto-download de toolchains
 }
+
+// Configuración unificada para Java 24 - Comentada la configuración conflictiva
+// plugins.withType(JavaPlugin).configureEach {
+// 	project.tasks.withType(JavaCompile).configureEach { task ->
+// 		task.javaCompiler = javaToolchains.compilerFor {
+// 			languageVersion = JavaLanguageVersion.of(21)
+// 		}
+// 	}
+// }
 
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
@@ -32,6 +43,7 @@ dependencies {
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+	testRuntimeOnly 'com.h2database:h2' // Base de datos en memoria para tests
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.6.0'
 	implementation 'com.microsoft.sqlserver:mssql-jdbc'
     implementation 'org.mapstruct:mapstruct:1.6.3'
@@ -41,4 +53,57 @@ dependencies {
 
 tasks.named('test') {
 	useJUnitPlatform()
+	finalizedBy jacocoTestReport // Genera reporte después de tests
+}
+
+// Configuración de JaCoCo para Coverage
+jacoco {
+	toolVersion = "0.8.11" // Versión más reciente compatible con Java 24
+}
+
+jacocoTestReport {
+	dependsOn test // Tests deben ejecutarse antes del reporte
+	
+	reports {
+		xml.required = true
+		csv.required = true 
+		html.required = true
+		html.outputLocation = layout.buildDirectory.dir('reports/jacoco')
+	}
+	
+	afterEvaluate {
+		classDirectories.setFrom(files(classDirectories.files.collect {
+			fileTree(dir: it, exclude: [
+				'**/*Application.*', // Excluir main class
+				'**/*Config.*',      // Excluir configuraciones
+				'**/*Entity.*',      // Excluir entidades JPA
+				'**/*DTO.*',         // Excluir DTOs
+				'**/dto/**',
+				'**/entity/**',
+				'**/config/**'
+			])
+		}))
+	}
+}
+
+jacocoTestCoverageVerification {
+	dependsOn jacocoTestReport
+	
+	violationRules {
+		rule {
+			limit {
+				counter = 'INSTRUCTION'
+				value = 'COVEREDRATIO'
+				minimum = 0.80 // 80% mínimo de cobertura
+			}
+		}
+		
+		rule {
+			limit {
+				counter = 'BRANCH' 
+				value = 'COVEREDRATIO'
+				minimum = 0.75 // 75% mínimo cobertura de branches
+			}
+		}
+	}
 }
