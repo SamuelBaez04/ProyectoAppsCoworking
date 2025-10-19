@@ -26,19 +26,18 @@ public class NotificacionServiceImpl implements NotificacionService {
 
     @Override
     public NotificacionDTO crearNotificacion(NotificacionCreateDTO createDTO) {
-        log.info("Creando nueva notificación para el usuario con cédula: {}",
-                createDTO.getUsuarioCedula());
+        log.info("Creando nueva notificacion para el usuario con cedula: {}", createDTO.getUsuarioCedula());
         NotificacionDTO creada = notificacionDAO.createNotificacion(createDTO);
-        log.info("Notificación creada exitosamente con ID: {}", creada.getIdNotificacion());
+        log.info("Notificacion creada exitosamente con ID: {}", creada.getIdNotificacion());
         return creada;
     }
 
     @Override
     public NotificacionDTO obtenerNotificacionPorId(Integer idNotificacion) {
-        log.debug("Buscando notificación con ID: {}", idNotificacion);
+        log.debug("Buscando notificacion con ID: {}", idNotificacion);
         return notificacionDAO.findById(idNotificacion).orElseThrow(() -> {
-            log.warn("Notificación no encontrada con ID: {}", idNotificacion);
-            return new RuntimeException("Notificación no encontrada con ID: " + idNotificacion);
+            log.warn("Notificacion no encontrada con ID: {}", idNotificacion);
+            return new RuntimeException("Notificacion no encontrada con ID: " + idNotificacion);
         });
     }
 
@@ -51,26 +50,26 @@ public class NotificacionServiceImpl implements NotificacionService {
 
     @Override
     public NotificacionDTO actualizarNotificacion(Integer idNotificacion, NotificacionUpdateDTO updateDTO) {
-        log.info("Actualizando notificación con ID: {}", idNotificacion);
+        log.info("Actualizando notificacion con ID: {}", idNotificacion);
         return notificacionDAO.update(idNotificacion, updateDTO).orElseThrow(() -> {
-            log.warn("Intento de actualizar notificación inexistente con ID: {}", idNotificacion);
-            return new RuntimeException("Notificación no encontrada con ID: " + idNotificacion);
+            log.warn("Intento de actualizar notificacion inexistente con ID: {}", idNotificacion);
+            return new RuntimeException("Notificacion no encontrada con ID: " + idNotificacion);
         });
     }
 
     @Override
     public void eliminarNotificacion(Integer idNotificacion) {
-        log.info("Eliminando notificación con ID: {}", idNotificacion);
+        log.info("Eliminando notificacion con ID: {}", idNotificacion);
         if (!notificacionDAO.deleteById(idNotificacion)) {
-            log.warn("Intento de eliminar notificación inexistente con ID: {}", idNotificacion);
-            throw new RuntimeException("Notificación no encontrada con ID: " + idNotificacion);
+            log.warn("Intento de eliminar notificacion inexistente con ID: {}", idNotificacion);
+            throw new RuntimeException("Notificacion no encontrada con ID: " + idNotificacion);
         }
-        log.info("Notificación eliminada con éxito con ID: {}", idNotificacion);
+        log.info("Notificacion eliminada con exito con ID: {}", idNotificacion);
     }
 
     @Override
     public List<NotificacionDTO> listarNotificacionesPorUsuario(Integer cedulaUsuario) {
-        log.debug("Listando notificaciones del usuario con cédula: {}", cedulaUsuario);
+        log.debug("Listando notificaciones del usuario con cedula: {}", cedulaUsuario);
         return notificacionDAO.findByUsuario(cedulaUsuario);
     }
 
@@ -88,12 +87,12 @@ public class NotificacionServiceImpl implements NotificacionService {
 
     @Override
     public NotificacionDTO marcarComoLeida(Integer idNotificacion) {
-        log.info("Marcando notificación como leída con ID: {}", idNotificacion);
+        log.info("Marcando notificacion como leida con ID: {}", idNotificacion);
         NotificacionDTO notificacion = obtenerNotificacionPorId(idNotificacion);
         NotificacionUpdateDTO updateDTO = new NotificacionUpdateDTO();
         updateDTO.setEstado(NotificacionEstado.LEIDO);
         NotificacionDTO actualizada = actualizarNotificacion(idNotificacion, updateDTO);
-        log.info("Notificación marcada como leída: {}", idNotificacion);
+        log.info("Notificacion marcada como leida: {}", idNotificacion);
         return actualizada;
     }
 }
